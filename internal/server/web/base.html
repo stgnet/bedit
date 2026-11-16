@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Title}}</title>
+<link rel="stylesheet" href="{{.Prefix}}/_static/bedit.css">
+{{block "head" .}}{{end}}
+</head>
+<body>
+{{/*
+  The one menu shared by every bedit page. On a document it shows that
+  document's actions; elsewhere it shows the general ones. Items for
+  features that don't exist yet are shown disabled, so the layout is
+  already in place for them.
+*/}}
+<header class="menu">
+  <a class="brand" href="{{.Prefix}}/">bedit</a>
+  {{with .Meta}}<span class="doctitle" title="{{.Title}}">{{.Title}}</span>{{end}}
+  <nav>
+    {{if .Meta}}
+      <span class="item off" title="Coming soon">Edit</span>
+      <span class="item off" title="Coming soon">Download</span>
+      {{if eq .Role "owner"}}
+        <span class="item off" title="Coming soon">Share</span>
+        <form method="post" action="{{.Prefix}}/{{.Meta.Name}}/_reimport">
+          <button class="item" title="{{if eq .Meta.Source.Kind "gdoc"}}Fetch the latest version from Google Docs{{else}}Import the original file again{{end}}">Re-import</button>
+        </form>
+      {{end}}
+      {{if eq .Meta.Source.Kind "gdoc"}}
+        <a class="item" href="https://docs.google.com/document/d/{{.Meta.Source.DocID}}/edit">Open in Google Docs</a>
+      {{end}}
+    {{else}}
+      <a class="item" href="{{.Prefix}}/#import">Import</a>
+    {{end}}
+    {{if .User}}
+      <span class="who">{{.User.Name}}</span>
+      <a class="item" href="{{.Prefix}}/_logout">Log out</a>
+    {{else}}
+      <a class="item" href="{{.Prefix}}/_login?next={{.Next}}">Log in</a>
+    {{end}}
+  </nav>
+</header>
+{{block "content" .}}{{end}}
+</body>
+</html>

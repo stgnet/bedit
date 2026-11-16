@@ -1,0 +1,13 @@
+{{define "head"}}
+{{range .Doc.Fonts}}<link rel="stylesheet" href="{{.}}">
+{{end}}<style>
+{{.Doc.CSS}}
+</style>
+{{end}}
+{{define "content"}}
+<main class="sheet">
+<article class="page">
+{{.Doc.Body}}
+</article>
+</main>
+{{end}}
