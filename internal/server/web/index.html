@@ -1,0 +1,49 @@
+{{define "content"}}
+<main class="panel">
+  {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
+
+  <h1>Documents</h1>
+  {{if .Docs}}
+  <table class="list">
+    <thead><tr><th>Title</th><th>Owner</th><th>Access</th><th>Imported</th></tr></thead>
+    <tbody>
+    {{range .Docs}}
+      <tr>
+        <td>{{if .CanView}}<a href="{{$.Prefix}}/{{.Meta.Name}}">{{.Meta.Title}}</a>{{else}}{{.Meta.Title}}{{end}}
+          <div class="sub">{{$.Prefix}}/{{.Meta.Name}}{{if .Role}} · you are {{.Role}}{{end}}</div></td>
+        <td>{{.Owner}}</td>
+        <td>{{publicLabel .Meta.Public}}</td>
+        <td>{{.Meta.Created.Format "Jan 2, 2006"}}</td>
+      </tr>
+    {{end}}
+    </tbody>
+  </table>
+  {{else}}
+  <p class="muted">No documents {{if .User}}you can see {{end}}yet.</p>
+  {{end}}
+
+  <h2 id="import">Import a Google Doc</h2>
+  {{if .User}}
+  <form class="import" method="post" action="{{.Prefix}}/_import" enctype="multipart/form-data">
+    <label>Google Docs link
+      <input type="url" name="link" value="{{.Form.Link}}" placeholder="https://docs.google.com/document/d/…/edit">
+    </label>
+    <p class="hint">The doc must be shared as “Anyone with the link can view”. For a private doc, use File › Download › Microsoft Word (.docx) in Google Docs and upload the file instead:</p>
+    <label>or upload a .docx file
+      <input type="file" name="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+    </label>
+    <label>Name in the URL <span class="muted">(optional, suggested from the title if blank)</span>
+      <span class="urlname">{{.Prefix}}/<input type="text" name="name" value="{{.Form.Name}}" pattern="[a-z0-9][a-z0-9\-]*" maxlength="80" placeholder="my-document"></span>
+    </label>
+    <label>Who can see it
+      <select name="public">
+        {{range .Levels}}<option value="{{.}}"{{if eq . $.Form.Public}} selected{{end}}>{{publicLabel .}}</option>{{end}}
+      </select>
+    </label>
+    <button type="submit">Import</button>
+  </form>
+  {{else}}
+  <p><a href="{{.Prefix}}/_login?next={{.Prefix}}/">Log in</a> to import documents.</p>
+  {{end}}
+</main>
+{{end}}

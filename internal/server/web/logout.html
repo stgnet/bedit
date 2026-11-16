@@ -1,0 +1,10 @@
+{{define "content"}}
+<main class="panel narrow">
+  <h1>Log out?</h1>
+  <p>Log-in is password-less for now, so once this browser forgets you,
+  there's no way to log back in as {{if .User}}<b>{{.User.Name}}</b>{{else}}the same user{{end}}.
+  You'd lose access to documents shared with you, and ownership of the ones you imported.</p>
+  <form method="post" action="{{.Prefix}}/_logout"><button type="submit">Log out anyway</button></form>
+  <p><a href="{{.Prefix}}/">Stay logged in</a></p>
+</main>
+{{end}}

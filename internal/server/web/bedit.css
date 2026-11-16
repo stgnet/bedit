@@ -1,0 +1,104 @@
+/* bedit's own chrome (menu, index, forms) plus the base rules for rendered
+   documents. Per-document rules (page size, named styles) are generated
+   by the renderer and inlined in each document page. */
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #f0f2f5;
+  color: #1f1f1f;
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+a { color: #0b57d0; }
+
+/* ---- shared top menu ---- */
+.menu {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 16px;
+  background: #fff; border-bottom: 1px solid #dadce0;
+}
+.menu .brand { font-weight: 700; font-size: 18px; color: #1f1f1f; text-decoration: none; }
+.menu .doctitle { font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.menu nav { margin-left: auto; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.menu form { margin: 0; }
+.menu .item {
+  display: inline-block; padding: 6px 10px; border-radius: 4px;
+  font: inherit; color: #1f1f1f; text-decoration: none;
+  background: none; border: 0; cursor: pointer;
+}
+.menu .item:hover { background: #f1f3f4; }
+.menu .item.off { color: #9aa0a6; cursor: default; }
+.menu .item.off:hover { background: none; }
+.menu .who { color: #5f6368; padding: 0 6px; }
+
+/* ---- index / forms ---- */
+.panel { max-width: 900px; margin: 24px auto; padding: 24px; background: #fff; border-radius: 8px; border: 1px solid #dadce0; }
+.panel.narrow { max-width: 520px; }
+.panel h1 { margin-top: 0; font-size: 22px; }
+.panel h2 { margin-top: 32px; font-size: 18px; }
+.muted, .sub { color: #5f6368; }
+.sub { font-size: 12px; }
+.error { color: #b3261e; background: #fce8e6; padding: 8px 12px; border-radius: 4px; }
+.list { width: 100%; border-collapse: collapse; }
+.list th, .list td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+.list th { font-weight: 600; color: #5f6368; font-size: 12px; }
+form label { display: block; margin: 14px 0 4px; font-weight: 600; }
+form input[type=url], form input[type=text], form select { display: block; width: 100%; margin-top: 4px; padding: 8px; font: inherit; border: 1px solid #c4c7c5; border-radius: 4px; }
+form input[type=file] { display: block; margin-top: 6px; font-weight: normal; }
+form .urlname { display: flex; align-items: center; gap: 2px; font-weight: normal; color: #5f6368; }
+form .urlname input { margin: 0; }
+form .hint { color: #5f6368; font-size: 13px; margin: 4px 0; }
+form button[type=submit] { margin-top: 18px; padding: 8px 20px; font: inherit; color: #fff; background: #0b57d0; border: 0; border-radius: 4px; cursor: pointer; }
+@media (max-width: 600px) {
+  .panel { margin: 0; border-radius: 0; border: 0; padding: 16px; }
+  .list th:nth-child(3), .list td:nth-child(3) { display: none; }
+}
+
+/* ---- rendered document ----
+   The page is a white sheet; its width and margins come from the
+   document (generated CSS). content-box so the width set there is the
+   text column, exactly as in Docs. */
+.sheet { padding: 24px 0 64px; }
+.page {
+  box-sizing: content-box;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, .3);
+  overflow-wrap: break-word;
+  /* A new block formatting context, so floated images can't stick out
+     of the bottom of the page. */
+  display: flow-root;
+}
+@media (max-width: 600px) { .sheet { padding: 0; } }
+
+/* Reset browser defaults on everything a paragraph can render as, so the
+   document's own styles are the only formatting. */
+.page p, .page h1, .page h2, .page h3, .page h4, .page h5, .page h6 {
+  margin: 0;
+  /* Docs keeps runs of spaces and shows tabs; pre-wrap does the same.
+     It is set here, not on .page, because between blocks the HTML has
+     newlines that must not turn into blank lines. */
+  white-space: pre-wrap;
+  /* Docs' default tab stops are every half inch. */
+  tab-size: 36pt;
+}
+.page a { color: inherit; }
+.page .lm { display: inline-block; text-indent: 0; white-space: pre; }
+.page .lmw { white-space: nowrap; }
+
+/* Images: the wrapper has the displayed (cropped) size; the img inside
+   is positioned to show the right part of the full picture. */
+.page .img { display: inline-block; position: relative; overflow: hidden; max-width: 100%; vertical-align: baseline; text-indent: 0; }
+.page .img.blk { display: block; }
+.page .img img { position: absolute; left: 0; top: 0; max-width: none; }
+
+/* Page breaks have no pages to break in a continuous view, so they are
+   just marked with a faint line. */
+.page .pb { display: block; border-top: 1px dashed #dadce0; margin: 12pt 0; }
+.page .pbb { border-top: 1px dashed #dadce0; }
+
+.page table.t { border-collapse: collapse; max-width: 100%; margin: 0; }
+.page table.t td { vertical-align: top; }
+/* Zero-width float that pushes a wrapped image down; see render.image. */
+.page .fsp { width: 0; }
